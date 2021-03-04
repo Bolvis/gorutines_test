@@ -14,28 +14,23 @@ type counter struct {
 
 const TimeFormat = "0.000000"
 const BitSize = 64
-const Iterations = 10000
+const Iterations = 100
 
 func main() {
 
 	timeOne := measureTime(true)
-
-	for i := 0; 100 > i; i++ {
-		fmt.Print("-")
-	}
-	fmt.Print("\n")
-
+	printLine(100)
 	timeTwo := measureTime(false)
-
+	printLine(100)
 	controlTime := singleThreadControlSumTime()
 
-	fmt.Printf("Control time is %f\n", controlTime)
+	fmt.Printf("\nControl time is %f\n", controlTime)
 
 	if timeOne > timeTwo {
-		fmt.Printf("\nWith locking took %f longer", timeOne-timeTwo)
+		fmt.Printf("\nWith locking took %f longer\n", timeOne-timeTwo)
 		return
 	}
-	fmt.Printf("\nWithout locking took %f longer", timeTwo-timeOne)
+	fmt.Printf("\nWithout locking took %f longer\n", timeTwo-timeOne)
 
 }
 
@@ -79,4 +74,11 @@ func singleThreadControlSumTime() float64 {
 	difference := timeEnd - timeStart
 	fmt.Printf("Start: %f End: %f Diference: %f\n", timeStart, timeEnd, difference)
 	return difference
+}
+
+func printLine(length int) {
+	for i := 0; length > i; i++ {
+		fmt.Print("-")
+	}
+	fmt.Print("\n")
 }
