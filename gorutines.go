@@ -6,24 +6,25 @@ import (
 	"time"
 )
 
+const Iterations = 10000
+const LineLength = 80
+const ControlTestName = "control test"
+const LockingTestName = "test with locking"
+const NoLockingTestName = "test without locking"
+
 type counter struct {
 	mutex sync.Mutex
 	x     int
 }
 
-const Iterations = 10000
-const LineLength = 80
-
 func main() {
-
-	timeOne := measureTime(true)
-	timeTwo := measureTime(false)
+	timeWithLocking := measureTime(true)
+	timeWithoutLocking := measureTime(false)
 	controlTime := singleThreadControlSumTime()
 
-	printControlResults(timeOne, controlTime, "with locking")
-	printControlResults(timeTwo, controlTime, "without locking")
-	printResults(timeOne, timeTwo)
-
+	compareTimes(timeWithLocking, controlTime, LockingTestName, ControlTestName)
+	compareTimes(timeWithoutLocking, controlTime, NoLockingTestName, ControlTestName)
+	compareTimes(timeWithLocking, timeWithoutLocking, LockingTestName, NoLockingTestName)
 }
 
 func measureTime(lock bool) int64 {
@@ -52,7 +53,6 @@ func work(number int, wg *sync.WaitGroup, counter *counter, lock bool) {
 	if lock {
 		counter.mutex.Lock()
 	}
-	//fmt.Printf("iteration: %d counter: %d\n", number, counter.x)
 	checkIfPrime(number)
 	counter.x++
 	if lock {
@@ -66,7 +66,6 @@ func singleThreadControlSumTime() int64 {
 	printLine(LineLength)
 	fmt.Println("Control task")
 	for i := 0; Iterations > i; i++ {
-		//fmt.Printf("iteration: %d counter: %d\n", i, counter)
 		checkIfPrime(i)
 		counter++
 	}
@@ -95,29 +94,16 @@ func checkIfPrime(number int) bool {
 	return dividers == 0
 }
 
-func printResults(timeOne int64, timeTwo int64) {
+func compareTimes(timeOne int64, timeTwo int64, nameOne string, nameTwo string) {
 	printLine(LineLength)
+	fmt.Printf("Compare %s with %s:\n", nameOne, nameTwo)
 	if timeOne > timeTwo {
 		difference := timeOne - timeTwo
 		percentage := float64(difference*100) / float64(timeTwo)
-		fmt.Printf("With locking took %d nanoseconds (%f %%) more\n\n", difference, percentage)
+		fmt.Printf("%s took %d nanoseconds (%f %%) more\n\n", nameOne, difference, percentage)
 		return
 	}
 	difference := timeTwo - timeOne
 	percentage := float64(difference*100) / float64(timeOne)
-	fmt.Printf("With locking took %d nanoseconds (%f %%) more\n\n", difference, percentage)
-}
-
-func printControlResults(testTime int64, controlTime int64, testName string) {
-	printLine(LineLength)
-	fmt.Printf("Compare control task with \"%s\" task:\n", testName)
-	if testTime > controlTime {
-		difference := testTime - controlTime
-		percentage := float64(difference*100) / float64(controlTime)
-		fmt.Printf("Test %s took %d nanoseconds (%f %%) more\n", testName, difference, percentage)
-		return
-	}
-	difference := controlTime - testTime
-	percentage := float64(difference*100) / float64(testTime)
-	fmt.Printf("Control task took %d nanoseconds (%f %%) more\n", difference, percentage)
+	fmt.Printf("%s took %d nanoseconds (%f %%) more\n\n", nameTwo, difference, percentage)
 }
