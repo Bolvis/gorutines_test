@@ -18,30 +18,33 @@ type counter struct {
 }
 
 func main() {
-	timeWithLocking := measureTime(true)
-	timeWithoutLocking := measureTime(false)
-	controlTime := singleThreadControlSumTime()
+	timeWithLocking := measureTime(true, false, LockingTestName)
+	timeWithoutLocking := measureTime(false, false, NoLockingTestName)
+	controlTime := measureTime(false, true, ControlTestName)
 
 	compareTimes(timeWithLocking, controlTime, LockingTestName, ControlTestName)
 	compareTimes(timeWithoutLocking, controlTime, NoLockingTestName, ControlTestName)
 	compareTimes(timeWithLocking, timeWithoutLocking, LockingTestName, NoLockingTestName)
 }
 
-func measureTime(lock bool) int64 {
+func measureTime(lock bool, singleThread bool, header string) int64 {
 	var waitGroup sync.WaitGroup
 	counter := counter{x: 0}
 	timeStart := time.Now().UnixNano()
 	printLine(LineLength)
-	if lock {
-		fmt.Println("With locking")
-	} else {
-		fmt.Println("Without locking")
-	}
+	fmt.Println(header)
 	for i := 0; Iterations > i; i++ {
+		if singleThread {
+			checkIfPrime(i)
+			counter.x++
+			continue
+		}
 		waitGroup.Add(1)
 		go work(i, &waitGroup, &counter, lock)
 	}
-	waitGroup.Wait()
+	if !singleThread {
+		waitGroup.Wait()
+	}
 	timeEnd := time.Now().UnixNano()
 	difference := timeEnd - timeStart
 	fmt.Printf("Start: %d End: %d Diference: %d\n", timeStart, timeEnd, difference)
@@ -58,21 +61,6 @@ func work(number int, wg *sync.WaitGroup, counter *counter, lock bool) {
 	if lock {
 		counter.mutex.Unlock()
 	}
-}
-
-func singleThreadControlSumTime() int64 {
-	timeStart := time.Now().UnixNano()
-	counter := 0
-	printLine(LineLength)
-	fmt.Println("Control task")
-	for i := 0; Iterations > i; i++ {
-		checkIfPrime(i)
-		counter++
-	}
-	timeEnd := time.Now().UnixNano()
-	difference := timeEnd - timeStart
-	fmt.Printf("Start: %d End: %d Diference: %d\n", timeStart, timeEnd, difference)
-	return difference
 }
 
 func printLine(length int) {
