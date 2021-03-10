@@ -6,11 +6,11 @@ import (
 	"time"
 )
 
-const Iterations = 10000
-const LineLength = 80
-const ControlTestName = "control test"
-const LockingTestName = "test with locking"
-const NoLockingTestName = "test without locking"
+const iterations = 10000
+const lineLength = 80
+const controlTestName = "control test"
+const lockingTestName = "test with locking"
+const noLockingTestName = "test without locking"
 
 type counter struct {
 	mutex sync.Mutex
@@ -18,22 +18,22 @@ type counter struct {
 }
 
 func main() {
-	timeWithLocking := measureTime(true, false, LockingTestName)
-	timeWithoutLocking := measureTime(false, false, NoLockingTestName)
-	controlTime := measureTime(false, true, ControlTestName)
+	timeWithLocking := measureTime(true, false, lockingTestName)
+	timeWithoutLocking := measureTime(false, false, noLockingTestName)
+	controlTime := measureTime(false, true, controlTestName)
 
-	compareTimes(timeWithLocking, controlTime, LockingTestName, ControlTestName)
-	compareTimes(timeWithoutLocking, controlTime, NoLockingTestName, ControlTestName)
-	compareTimes(timeWithLocking, timeWithoutLocking, LockingTestName, NoLockingTestName)
+	compareTimes(timeWithLocking, controlTime, lockingTestName, controlTestName)
+	compareTimes(timeWithoutLocking, controlTime, noLockingTestName, controlTestName)
+	compareTimes(timeWithLocking, timeWithoutLocking, lockingTestName, noLockingTestName)
 }
 
 func measureTime(lock bool, singleThread bool, header string) int64 {
 	var waitGroup sync.WaitGroup
 	counter := counter{x: 0}
 	timeStart := time.Now().UnixNano()
-	printLine(LineLength)
+	printLine(lineLength)
 	fmt.Println(header)
-	for i := 0; Iterations > i; i++ {
+	for i := 0; iterations > i; i++ {
 		if singleThread {
 			checkIfPrime(i)
 			counter.x++
@@ -83,7 +83,7 @@ func checkIfPrime(number int) bool {
 }
 
 func compareTimes(timeOne int64, timeTwo int64, nameOne string, nameTwo string) {
-	printLine(LineLength)
+	printLine(lineLength)
 	fmt.Printf("Compare %s with %s:\n", nameOne, nameTwo)
 	if timeOne > timeTwo {
 		difference := timeOne - timeTwo
