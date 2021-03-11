@@ -14,7 +14,7 @@ const noLockingTestName = "test without locking"
 
 type counter struct {
 	mutex sync.Mutex
-	x     int
+	x     int64
 }
 
 func main() {
