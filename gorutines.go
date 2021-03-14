@@ -6,11 +6,13 @@ import (
 	"time"
 )
 
-const iterations = 10000
-const lineLength = 80
-const controlTestName = "control test"
-const lockingTestName = "test with locking"
-const noLockingTestName = "test without locking"
+const (
+	iterations        = 10000
+	lineLength        = 80
+	controlTestName   = "control test"
+	lockingTestName   = "test with locking"
+	noLockingTestName = "test without locking"
+)
 
 type counter struct {
 	mutex sync.Mutex
