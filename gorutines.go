@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	iterations        = 10000
+	iterations        = 100000
 	lineLength        = 80
 	controlTestName   = "control test"
 	lockingTestName   = "test with locking"
@@ -50,7 +50,7 @@ func measureTime(lock bool, singleThread bool, header string) int64 {
 	timeEnd := time.Now().UnixNano()
 	difference := timeEnd - timeStart
 	fmt.Printf("Start: %d End: %d Diference: %d\n", timeStart, timeEnd, difference)
-	return difference
+	return difference / 1000
 }
 
 func work(number int, wg *sync.WaitGroup, counter *counter, lock bool) {
