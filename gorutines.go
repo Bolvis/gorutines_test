@@ -49,7 +49,7 @@ func measureTime(lock bool, singleThread bool, header string) int64 {
 	}
 	timeEnd := time.Now().UnixNano()
 	difference := timeEnd - timeStart
-	fmt.Printf("Start: %d End: %d Diference: %d\n", timeStart, timeEnd, difference)
+	fmt.Printf("Start: %d End: %d Difference: %d\n", timeStart, timeEnd, difference)
 	return difference / 1000
 }
 
