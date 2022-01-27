@@ -86,7 +86,7 @@ func checkIfPrime(number int) bool {
 
 func compareTimes(timeOne int64, timeTwo int64, nameOne string, nameTwo string) {
 	printLine(lineLength)
-	fmt.Printf("Compare %s with %s:\n", nameOne, nameTwo)
+	fmt.Printf("Compare %s and %s:\n", nameOne, nameTwo)
 	if timeOne > timeTwo {
 		difference := timeOne - timeTwo
 		percentage := float64(difference*100) / float64(timeTwo)
